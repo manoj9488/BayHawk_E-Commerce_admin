@@ -1400,10 +1400,6 @@
     min-width: 150px;
   }
 
-  .min-w-\[180px\] {
-    min-width: 180px;
-  }
-
   .min-w-\[var\(--radix-select-trigger-width\)\] {
     min-width: var(--radix-select-trigger-width);
   }

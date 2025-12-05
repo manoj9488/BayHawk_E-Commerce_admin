@@ -112,6 +112,182 @@ const mockGeneratedReports: GeneratedReport[] = [
 export default function ReportsPage() {
   const [generateOpen, setGenerateOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
+  const [reports, setReports] = useState<GeneratedReport[]>(mockGeneratedReports)
+  const [period, setPeriod] = useState<string>("")
+  const [hub, setHub] = useState<string>("")
+  const [date, setDate] = useState<string>("")
+  const [exportFormat, setExportFormat] = useState<string>("pdf")
+
+  const generateReport = () => {
+    if (!selectedTemplate) return
+
+    const template = reportTemplates.find(t => t.id === selectedTemplate)
+    if (!template) return
+
+    const hubName = hub === 'all' ? 'All Hubs' : hub === 'central' ? 'Chennai Central' : hub === 'south' ? 'Chennai South' : hub === 'north' ? 'Chennai North' : 'All Hubs'
+    const reportDate = date || new Date().toLocaleDateString()
+
+    const newReport: GeneratedReport = {
+      id: `RPT-${String(reports.length + 1).padStart(3, '0')}`,
+      name: `${template.name} - ${reportDate}`,
+      type: selectedTemplate,
+      period: period || 'daily',
+      generatedAt: new Date().toISOString(),
+      status: 'generating',
+      hub: hubName,
+      dateRange: reportDate
+    }
+
+    setReports(prev => [newReport, ...prev])
+
+    // Generate file based on format
+    setTimeout(() => {
+      const reportData = `Report: ${newReport.name}\nType: ${template.name}\nPeriod: ${period || 'daily'}\nHub: ${hubName}\nDate: ${reportDate}\nGenerated: ${new Date().toLocaleString()}`
+      
+      if (exportFormat === 'pdf') {
+        const blob = new Blob([reportData], { type: 'application/pdf' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${newReport.id}_${template.name}.pdf`
+        a.click()
+        URL.revokeObjectURL(url)
+      } else if (exportFormat === 'excel') {
+        const csvData = `Report Name,Type,Period,Hub,Date,Generated\n"${newReport.name}","${template.name}","${period || 'daily'}","${hubName}","${reportDate}","${new Date().toLocaleString()}"`
+        const blob = new Blob([csvData], { type: 'application/vnd.ms-excel' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${newReport.id}_${template.name}.xls`
+        a.click()
+        URL.revokeObjectURL(url)
+      } else if (exportFormat === 'csv') {
+        const csvData = `Report Name,Type,Period,Hub,Date,Generated\n"${newReport.name}","${template.name}","${period || 'daily'}","${hubName}","${reportDate}","${new Date().toLocaleString()}"`
+        const blob = new Blob([csvData], { type: 'text/csv' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `${newReport.id}_${template.name}.csv`
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+
+      setReports(prev => prev.map(r => 
+        r.id === newReport.id ? { ...r, status: 'ready' } : r
+      ))
+    }, 2000)
+
+    setGenerateOpen(false)
+    setSelectedTemplate(null)
+    setPeriod("")
+    setHub("")
+    setDate("")
+    setExportFormat("pdf")
+  }
+
+  const quickGenerate = (templateId: string, selectedPeriod: string = 'daily') => {
+    const template = reportTemplates.find(t => t.id === templateId)
+    if (!template) return
+
+    const today = new Date()
+    let dateRange = today.toLocaleDateString()
+    
+    if (selectedPeriod === 'weekly') {
+      const weekStart = new Date(today)
+      weekStart.setDate(today.getDate() - 7)
+      dateRange = `${weekStart.toLocaleDateString()} - ${today.toLocaleDateString()}`
+    } else if (selectedPeriod === 'monthly') {
+      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+      dateRange = `${monthStart.toLocaleDateString()} - ${today.toLocaleDateString()}`
+    }
+
+    const newReport: GeneratedReport = {
+      id: `RPT-${String(reports.length + 1).padStart(3, '0')}`,
+      name: `${template.name} - ${selectedPeriod.charAt(0).toUpperCase() + selectedPeriod.slice(1)}`,
+      type: templateId,
+      period: selectedPeriod,
+      generatedAt: new Date().toISOString(),
+      status: 'generating',
+      hub: 'All Hubs',
+      dateRange: dateRange
+    }
+
+    setReports(prev => [newReport, ...prev])
+
+    setTimeout(() => {
+      setReports(prev => prev.map(r => 
+        r.id === newReport.id ? { ...r, status: 'ready' } : r
+      ))
+    }, 2000)
+  }
+
+  const handleDownload = (report: GeneratedReport) => {
+    const data = `Report: ${report.name}\nType: ${report.type}\nPeriod: ${report.period}\nHub: ${report.hub}\nDate Range: ${report.dateRange}\nGenerated: ${new Date(report.generatedAt).toLocaleString()}\nStatus: ${report.status}`
+    const blob = new Blob([data], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${report.id}_${report.name}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handlePrint = (report: GeneratedReport) => {
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>${report.name}</title>
+            <style>
+              body { font-family: Arial, sans-serif; padding: 20px; }
+              h1 { color: #333; }
+              .info { margin: 10px 0; }
+            </style>
+          </head>
+          <body>
+            <h1>${report.name}</h1>
+            <div class="info"><strong>Type:</strong> ${report.type}</div>
+            <div class="info"><strong>Period:</strong> ${report.period}</div>
+            <div class="info"><strong>Hub:</strong> ${report.hub}</div>
+            <div class="info"><strong>Date Range:</strong> ${report.dateRange}</div>
+            <div class="info"><strong>Generated:</strong> ${new Date(report.generatedAt).toLocaleString()}</div>
+            <div class="info"><strong>Status:</strong> ${report.status}</div>
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+      printWindow.print()
+    }
+  }
+
+  const handleShare = (report: GeneratedReport) => {
+    if (navigator.share) {
+      navigator.share({
+        title: report.name,
+        text: `${report.name} - ${report.dateRange}`,
+        url: window.location.href
+      }).catch(() => {})
+    } else {
+      navigator.clipboard.writeText(`${report.name} - ${report.dateRange} - ${window.location.href}`)
+      alert('Report link copied to clipboard!')
+    }
+  }
+
+  const handleRefresh = (report: GeneratedReport) => {
+    setReports(prev => prev.map(r => 
+      r.id === report.id 
+        ? { ...r, status: 'generating', generatedAt: new Date().toISOString() }
+        : r
+    ))
+    setTimeout(() => {
+      setReports(prev => prev.map(r => 
+        r.id === report.id 
+          ? { ...r, status: 'ready' }
+          : r
+      ))
+    }, 2000)
+  }
 
   const statusColors: Record<string, string> = {
     ready: "bg-success/20 text-success border-success/30",
@@ -186,16 +362,16 @@ export default function ReportsPage() {
       header: "Actions",
       cell: (report: GeneratedReport) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" disabled={report.status !== "ready"}>
+          <Button variant="ghost" size="icon" disabled={report.status !== "ready"} onClick={() => handleDownload(report)}>
             <Download className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" disabled={report.status !== "ready"}>
+          <Button variant="ghost" size="icon" disabled={report.status !== "ready"} onClick={() => handlePrint(report)}>
             <Printer className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" disabled={report.status !== "ready"}>
+          <Button variant="ghost" size="icon" disabled={report.status !== "ready"} onClick={() => handleShare(report)}>
             <Share2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" onClick={() => handleRefresh(report)}>
             <RotateCcw className="h-4 w-4" />
           </Button>
         </div>
@@ -248,7 +424,7 @@ export default function ReportsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="period">Period</Label>
-                      <Select>
+                      <Select value={period} onValueChange={setPeriod}>
                         <SelectTrigger id="period">
                           <SelectValue placeholder="Select period" />
                         </SelectTrigger>
@@ -262,7 +438,7 @@ export default function ReportsPage() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="hub">Hub</Label>
-                      <Select>
+                      <Select value={hub} onValueChange={setHub}>
                         <SelectTrigger id="hub">
                           <SelectValue placeholder="Select hub" />
                         </SelectTrigger>
@@ -277,18 +453,33 @@ export default function ReportsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="date">Date</Label>
-                    <Input id="date" type="date" />
+                    <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
                   </div>
                   <div className="space-y-2">
                     <Label>Export Format</Label>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={`flex-1 ${exportFormat === 'pdf' ? 'bg-primary text-primary-foreground' : 'bg-transparent'}`}
+                        onClick={() => setExportFormat('pdf')}
+                      >
                         PDF
                       </Button>
-                      <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={`flex-1 ${exportFormat === 'excel' ? 'bg-primary text-primary-foreground' : 'bg-transparent'}`}
+                        onClick={() => setExportFormat('excel')}
+                      >
                         Excel
                       </Button>
-                      <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={`flex-1 ${exportFormat === 'csv' ? 'bg-primary text-primary-foreground' : 'bg-transparent'}`}
+                        onClick={() => setExportFormat('csv')}
+                      >
                         CSV
                       </Button>
                     </div>
@@ -300,7 +491,7 @@ export default function ReportsPage() {
                 <Button variant="outline" onClick={() => setGenerateOpen(false)}>
                   Cancel
                 </Button>
-                <Button disabled={!selectedTemplate}>Generate Report</Button>
+                <Button disabled={!selectedTemplate} onClick={generateReport}>Generate Report</Button>
               </div>
             </div>
           </DialogContent>
@@ -310,18 +501,28 @@ export default function ReportsPage() {
       {/* Quick Actions */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {reportTemplates.slice(0, 3).map((template) => (
-          <Card key={template.id} className="hover:border-primary/50 transition-colors cursor-pointer">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-primary/10">
-                <template.icon className="h-6 w-6 text-primary" />
+          <Card key={template.id} className="hover:border-primary/50 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4 mb-3">
+                <div className="p-3 rounded-lg bg-primary/10">
+                  <template.icon className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium">{template.name}</p>
+                  <p className="text-sm text-muted-foreground">{template.description}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="font-medium">{template.name}</p>
-                <p className="text-sm text-muted-foreground">{template.description}</p>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => quickGenerate(template.id, 'daily')}>
+                  Daily
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => quickGenerate(template.id, 'weekly')}>
+                  Weekly
+                </Button>
+                <Button variant="outline" size="sm" className="flex-1" onClick={() => quickGenerate(template.id, 'monthly')}>
+                  Monthly
+                </Button>
               </div>
-              <Button variant="outline" size="sm">
-                <Plus className="h-4 w-4" />
-              </Button>
             </CardContent>
           </Card>
         ))}
@@ -334,7 +535,7 @@ export default function ReportsPage() {
           <CardDescription>View and download previously generated reports</CardDescription>
         </CardHeader>
         <CardContent>
-          <DataTable data={mockGeneratedReports} columns={columns} searchPlaceholder="Search reports..." />
+          <DataTable data={reports} columns={columns} searchPlaceholder="Search reports..." />
         </CardContent>
       </Card>
     </div>
