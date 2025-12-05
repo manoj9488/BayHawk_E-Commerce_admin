@@ -1,0 +1,70 @@
+Core Admin Pages (8 Main Sections) 
+1. Login & Team Login
+Admin/team member login page (email, password, OTP)
+Role-based access (e.g. Super Admin, Procurement, Packing, Delivery & Custom user access)
+
+2. Dashboard (App & Website Overview)(Both hub & Multi store)
+Key stats: Total orders, sales, inventory, users, delivery status
+Custom graphs: Sales trend, order status breakdown, stock level alerts
+Quick links: Pending orders, low stock
+
+3. Order Management (Both hub & Multi store)
+View/manage all orders (live, manual, sources: WhatsApp, Insta, FB)
+Assign orders to delivery partners and track updates
+Multi-store and hub order switching manual
+Manual user/order creation if source is not app/web
+Update order status logic and history (e.g. Received, Packed, Delivered)
+Order Filtering & Search (Quick Search, Date Range Filter, Status Filter, Hub/Zone Filter, Payment Method & Delivery Slot )
+
+4. Team & User Management (Both hub & multi store)
+Manage all team IDs (packing, procurement, delivery, etc.)
+Assign/track orders per team/delivery partner
+View team performance & delivery history
+User/customer management (view, edit, deactivate, details, address search & Google Maps)
+Delivery Agent Management (Add,remove,deactivate, Verify, order assignment, rating & review, History ) 
+
+5. Product & Stock Management (Both hub & multi store)
+Add, update, delete products (edit price, info)
+Manage labels, packing, procurement (cutting type report)
+Product & Stock status per store (multi-store supported)
+Bulk update tools
+
+6. Report Center
+Auto-generate customizable reports (daily, weekly, monthly)
+Packing, procurement, labeling, printable labeling, stock reports	
+Download/share options for admins/teams
+Release and restore functionality for corrected reports
+
+7. Marketing & Notifications
+Coupon code/offers management, set validity/running times
+Scratch card rewards management
+Spinner wheel rewards management
+Automated/manual push notifications and custom messages to users
+Subscription and in-app currency updates
+Google Maps with geo-pin for address & delivery
+
+8. Support & Settings
+Live chat with users
+Release management (app updates, feature toggles)
+Manage legal: Privacy & Terms (edit/view, shown on app footer)
+Easy 3rd-party integration: Connect other platforms if needed
+Contact us & admin help
+Feature toggles (enable/disable features)
+Delivery slot configuration
+
+
+Features in Every Main Page
+Clear sidebar navigation, breadcrumb trails, role-based quick filters, Date Range Filter
+Search, pagination, and responsive layout for easy mobile/tablet admin
+Export options for most tables/reports (CSV, PDF, Excel)
+All key actions in 1-2 clicks (assign, update, delete)
+ 
+Additional Built-In Tools
+Spinner wheel rewards shown in order/update flows
+Automated reports and alerts for future scalability (future-proofed widgets)
+Google Maps integration (address entry, route planning for deliveries)
+Audit logs for all critical changes (orders, team, stock, delivery)
+Restore previous states (rollback management)
+Multi-language support: English & Tamil languages
+Predictive analytics: AI-powered demand forecasting (optional)
+SEO friendly website

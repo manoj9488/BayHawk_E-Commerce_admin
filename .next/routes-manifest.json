@@ -1,0 +1,200 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/admin/audit",
+      "regex": "^/admin/audit(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/audit(?:/)?$"
+    },
+    {
+      "page": "/admin/demo",
+      "regex": "^/admin/demo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/demo(?:/)?$"
+    },
+    {
+      "page": "/admin/marketing",
+      "regex": "^/admin/marketing(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/marketing(?:/)?$"
+    },
+    {
+      "page": "/admin/marketing/notifications",
+      "regex": "^/admin/marketing/notifications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/marketing/notifications(?:/)?$"
+    },
+    {
+      "page": "/admin/marketing/rewards",
+      "regex": "^/admin/marketing/rewards(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/marketing/rewards(?:/)?$"
+    },
+    {
+      "page": "/admin/orders",
+      "regex": "^/admin/orders(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/orders(?:/)?$"
+    },
+    {
+      "page": "/admin/products",
+      "regex": "^/admin/products(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/products(?:/)?$"
+    },
+    {
+      "page": "/admin/products/categories",
+      "regex": "^/admin/products/categories(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/products/categories(?:/)?$"
+    },
+    {
+      "page": "/admin/products/stock",
+      "regex": "^/admin/products/stock(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/products/stock(?:/)?$"
+    },
+    {
+      "page": "/admin/reports",
+      "regex": "^/admin/reports(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/reports(?:/)?$"
+    },
+    {
+      "page": "/admin/settings",
+      "regex": "^/admin/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/settings(?:/)?$"
+    },
+    {
+      "page": "/admin/settings/delivery-slots",
+      "regex": "^/admin/settings/delivery\\-slots(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/settings/delivery\\-slots(?:/)?$"
+    },
+    {
+      "page": "/admin/settings/hubs",
+      "regex": "^/admin/settings/hubs(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/settings/hubs(?:/)?$"
+    },
+    {
+      "page": "/admin/settings/integrations",
+      "regex": "^/admin/settings/integrations(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/settings/integrations(?:/)?$"
+    },
+    {
+      "page": "/admin/settings/legal",
+      "regex": "^/admin/settings/legal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/settings/legal(?:/)?$"
+    },
+    {
+      "page": "/admin/settings/releases",
+      "regex": "^/admin/settings/releases(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/settings/releases(?:/)?$"
+    },
+    {
+      "page": "/admin/support",
+      "regex": "^/admin/support(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/support(?:/)?$"
+    },
+    {
+      "page": "/admin/team",
+      "regex": "^/admin/team(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/team(?:/)?$"
+    },
+    {
+      "page": "/admin/team/admin-management",
+      "regex": "^/admin/team/admin\\-management(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/team/admin\\-management(?:/)?$"
+    },
+    {
+      "page": "/admin/team/customers",
+      "regex": "^/admin/team/customers(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/team/customers(?:/)?$"
+    },
+    {
+      "page": "/admin/team/delivery",
+      "regex": "^/admin/team/delivery(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/team/delivery(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
