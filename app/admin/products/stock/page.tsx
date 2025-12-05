@@ -90,16 +90,59 @@ export default function StockManagementPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [stockFilter, setStockFilter] = useState<"all" | "low" | "out">("all")
   const [hubFilter, setHubFilter] = useState("all")
+  const [updateType, setUpdateType] = useState("add")
+  const [quantity, setQuantity] = useState("")
+  const [reason, setReason] = useState("")
+  const [selectedHub, setSelectedHub] = useState("")
+  const [products, setProducts] = useState(mockProducts)
 
-  const filteredProducts = mockProducts.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     if (stockFilter === "low" && product.stock > product.lowStockThreshold) return false
     if (stockFilter === "out" && product.stock > 0) return false
     return true
   })
 
-  const lowStockCount = mockProducts.filter((p) => p.stock <= p.lowStockThreshold && p.stock > 0).length
-  const outOfStockCount = mockProducts.filter((p) => p.stock === 0).length
-  const healthyStockCount = mockProducts.filter((p) => p.stock > p.lowStockThreshold).length
+  const lowStockCount = products.filter((p) => p.stock <= p.lowStockThreshold && p.stock > 0).length
+  const outOfStockCount = products.filter((p) => p.stock === 0).length
+  const healthyStockCount = products.filter((p) => p.stock > p.lowStockThreshold).length
+
+  const handleUpdateStock = (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!selectedProduct || !quantity || !reason || !selectedHub) {
+      alert("Please fill all fields")
+      return
+    }
+
+    const qty = parseInt(quantity)
+    if (isNaN(qty) || qty <= 0) {
+      alert("Please enter a valid quantity")
+      return
+    }
+
+    setProducts(prev => prev.map(p => {
+      if (p.id === selectedProduct.id) {
+        let newStock = p.stock
+        if (updateType === "add") {
+          newStock = p.stock + qty
+        } else if (updateType === "remove") {
+          newStock = Math.max(0, p.stock - qty)
+        } else if (updateType === "set") {
+          newStock = qty
+        }
+        return { ...p, stock: newStock }
+      }
+      return p
+    }))
+
+    // Reset form
+    setUpdateStockOpen(false)
+    setQuantity("")
+    setReason("")
+    setSelectedHub("")
+    setUpdateType("add")
+    alert(`Stock updated successfully for ${selectedProduct.name} at ${mockHubs.find(h => h.id === selectedHub)?.name}`)
+  }
 
   const stockColumns = [
     {
@@ -341,7 +384,7 @@ export default function StockManagementPage() {
               <Package className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{mockProducts.length}</p>
+              <p className="text-2xl font-bold">{products.length}</p>
               <p className="text-sm text-muted-foreground">Total Products</p>
             </div>
           </CardContent>
@@ -447,7 +490,7 @@ export default function StockManagementPage() {
             <DialogDescription>{selectedProduct && `Update stock for ${selectedProduct.name}`}</DialogDescription>
           </DialogHeader>
           {selectedProduct && (
-            <form className="space-y-4">
+            <form onSubmit={handleUpdateStock} className="space-y-4">
               <div className="p-4 rounded-lg bg-secondary/30">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-muted-foreground">Current Stock</span>
@@ -464,8 +507,24 @@ export default function StockManagementPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="updateType">Update Type</Label>
-                <Select>
+                <Label htmlFor="hub">Hub / Store *</Label>
+                <Select value={selectedHub} onValueChange={setSelectedHub} required>
+                  <SelectTrigger id="hub">
+                    <SelectValue placeholder="Select hub" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mockHubs.map((hub) => (
+                      <SelectItem key={hub.id} value={hub.id}>
+                        {hub.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="updateType">Update Type *</Label>
+                <Select value={updateType} onValueChange={setUpdateType} required>
                   <SelectTrigger id="updateType">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
@@ -478,13 +537,21 @@ export default function StockManagementPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="quantity">Quantity</Label>
-                <Input id="quantity" type="number" placeholder="Enter quantity" />
+                <Label htmlFor="quantity">Quantity *</Label>
+                <Input 
+                  id="quantity" 
+                  type="number" 
+                  placeholder="Enter quantity" 
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  required
+                  min="1"
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="reason">Reason</Label>
-                <Select>
+                <Label htmlFor="reason">Reason *</Label>
+                <Select value={reason} onValueChange={setReason} required>
                   <SelectTrigger id="reason">
                     <SelectValue placeholder="Select reason" />
                   </SelectTrigger>
@@ -495,22 +562,6 @@ export default function StockManagementPage() {
                     <SelectItem value="return">Customer Return</SelectItem>
                     <SelectItem value="correction">Stock Correction</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="hub">Hub</Label>
-                <Select>
-                  <SelectTrigger id="hub">
-                    <SelectValue placeholder="Select hub" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mockHubs.map((hub) => (
-                      <SelectItem key={hub.id} value={hub.id}>
-                        {hub.name}
-                      </SelectItem>
-                    ))}
                   </SelectContent>
                 </Select>
               </div>

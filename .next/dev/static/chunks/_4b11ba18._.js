@@ -1157,14 +1157,55 @@ function StockManagementPage() {
     const [selectedProduct, setSelectedProduct] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [stockFilter, setStockFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("all");
     const [hubFilter, setHubFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("all");
-    const filteredProducts = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockProducts"].filter((product)=>{
+    const [updateType, setUpdateType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("add");
+    const [quantity, setQuantity] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [reason, setReason] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [selectedHub, setSelectedHub] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [products, setProducts] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockProducts"]);
+    const filteredProducts = products.filter((product)=>{
         if (stockFilter === "low" && product.stock > product.lowStockThreshold) return false;
         if (stockFilter === "out" && product.stock > 0) return false;
         return true;
     });
-    const lowStockCount = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockProducts"].filter((p)=>p.stock <= p.lowStockThreshold && p.stock > 0).length;
-    const outOfStockCount = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockProducts"].filter((p)=>p.stock === 0).length;
-    const healthyStockCount = __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockProducts"].filter((p)=>p.stock > p.lowStockThreshold).length;
+    const lowStockCount = products.filter((p)=>p.stock <= p.lowStockThreshold && p.stock > 0).length;
+    const outOfStockCount = products.filter((p)=>p.stock === 0).length;
+    const healthyStockCount = products.filter((p)=>p.stock > p.lowStockThreshold).length;
+    const handleUpdateStock = (e)=>{
+        e.preventDefault();
+        if (!selectedProduct || !quantity || !reason || !selectedHub) {
+            alert("Please fill all fields");
+            return;
+        }
+        const qty = parseInt(quantity);
+        if (isNaN(qty) || qty <= 0) {
+            alert("Please enter a valid quantity");
+            return;
+        }
+        setProducts((prev)=>prev.map((p)=>{
+                if (p.id === selectedProduct.id) {
+                    let newStock = p.stock;
+                    if (updateType === "add") {
+                        newStock = p.stock + qty;
+                    } else if (updateType === "remove") {
+                        newStock = Math.max(0, p.stock - qty);
+                    } else if (updateType === "set") {
+                        newStock = qty;
+                    }
+                    return {
+                        ...p,
+                        stock: newStock
+                    };
+                }
+                return p;
+            }));
+        // Reset form
+        setUpdateStockOpen(false);
+        setQuantity("");
+        setReason("");
+        setSelectedHub("");
+        setUpdateType("add");
+        alert(`Stock updated successfully for ${selectedProduct.name} at ${__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockHubs"].find((h)=>h.id === selectedHub)?.name}`);
+    };
     const stockColumns = [
         {
             key: "product",
@@ -1178,12 +1219,12 @@ function StockManagementPage() {
                                 className: "h-5 w-5 text-muted-foreground"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 111,
+                                lineNumber: 154,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 110,
+                            lineNumber: 153,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1193,7 +1234,7 @@ function StockManagementPage() {
                                     children: product.name
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 114,
+                                    lineNumber: 157,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1201,19 +1242,19 @@ function StockManagementPage() {
                                     children: product.sku
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 115,
+                                    lineNumber: 158,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 113,
+                            lineNumber: 156,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 109,
+                    lineNumber: 152,
                     columnNumber: 9
                 }, this)
         },
@@ -1225,7 +1266,7 @@ function StockManagementPage() {
                     children: product.category
                 }, void 0, false, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 123,
+                    lineNumber: 166,
                     columnNumber: 35
                 }, this)
         },
@@ -1251,7 +1292,7 @@ function StockManagementPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 135,
+                                    lineNumber: 178,
                                     columnNumber: 15
                                 }, this),
                                 isOutOfStock ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
@@ -1260,20 +1301,20 @@ function StockManagementPage() {
                                     children: "Out of Stock"
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 147,
+                                    lineNumber: 190,
                                     columnNumber: 17
                                 }, this) : isLowStock ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
                                     className: "bg-warning/20 text-warning border-warning/30 text-xs",
                                     children: "Low"
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 151,
+                                    lineNumber: 194,
                                     columnNumber: 17
                                 }, this) : null
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 134,
+                            lineNumber: 177,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$progress$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Progress"], {
@@ -1281,13 +1322,13 @@ function StockManagementPage() {
                             className: `h-2 ${isOutOfStock ? "[&>div]:bg-destructive" : isLowStock ? "[&>div]:bg-warning" : "[&>div]:bg-success"}`
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 154,
+                            lineNumber: 197,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 133,
+                    lineNumber: 176,
                     columnNumber: 11
                 }, this);
             }
@@ -1304,7 +1345,7 @@ function StockManagementPage() {
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 166,
+                    lineNumber: 209,
                     columnNumber: 9
                 }, this)
         },
@@ -1322,7 +1363,7 @@ function StockManagementPage() {
                                 className: "h-4 w-4 text-destructive"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 181,
+                                lineNumber: 224,
                                 columnNumber: 17
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1330,7 +1371,7 @@ function StockManagementPage() {
                                 children: "Critical"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 182,
+                                lineNumber: 225,
                                 columnNumber: 17
                             }, this)
                         ]
@@ -1340,7 +1381,7 @@ function StockManagementPage() {
                                 className: "h-4 w-4 text-warning"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 186,
+                                lineNumber: 229,
                                 columnNumber: 17
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1348,7 +1389,7 @@ function StockManagementPage() {
                                 children: "Low Stock"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 187,
+                                lineNumber: 230,
                                 columnNumber: 17
                             }, this)
                         ]
@@ -1358,7 +1399,7 @@ function StockManagementPage() {
                                 className: "h-4 w-4 text-success"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 191,
+                                lineNumber: 234,
                                 columnNumber: 17
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1366,14 +1407,14 @@ function StockManagementPage() {
                                 children: "Healthy"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 192,
+                                lineNumber: 235,
                                 columnNumber: 17
                             }, this)
                         ]
                     }, void 0, true)
                 }, void 0, false, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 178,
+                    lineNumber: 221,
                     columnNumber: 11
                 }, this);
             }
@@ -1395,19 +1436,19 @@ function StockManagementPage() {
                                 className: "h-4 w-4 mr-1"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 212,
+                                lineNumber: 255,
                                 columnNumber: 13
                             }, this),
                             "Update"
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 204,
+                        lineNumber: 247,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 203,
+                    lineNumber: 246,
                     columnNumber: 9
                 }, this)
         }
@@ -1423,7 +1464,7 @@ function StockManagementPage() {
                             children: movement.productName
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 226,
+                            lineNumber: 269,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1431,13 +1472,13 @@ function StockManagementPage() {
                             children: movement.productId
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 227,
+                            lineNumber: 270,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 225,
+                    lineNumber: 268,
                     columnNumber: 9
                 }, this)
         },
@@ -1451,19 +1492,19 @@ function StockManagementPage() {
                             className: "h-4 w-4 text-success"
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 237,
+                            lineNumber: 280,
                             columnNumber: 13
                         }, this) : movement.type === "out" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$down$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowDownRight$3e$__["ArrowDownRight"], {
                             className: "h-4 w-4 text-destructive"
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 239,
+                            lineNumber: 282,
                             columnNumber: 13
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__RotateCcw$3e$__["RotateCcw"], {
                             className: "h-4 w-4 text-warning"
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 241,
+                            lineNumber: 284,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$badge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Badge"], {
@@ -1472,13 +1513,13 @@ function StockManagementPage() {
                             children: movement.type === "in" ? "Stock In" : movement.type === "out" ? "Stock Out" : "Adjustment"
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 243,
+                            lineNumber: 286,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 235,
+                    lineNumber: 278,
                     columnNumber: 9
                 }, this)
         },
@@ -1493,7 +1534,7 @@ function StockManagementPage() {
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 262,
+                    lineNumber: 305,
                     columnNumber: 9
                 }, this)
         },
@@ -1505,7 +1546,7 @@ function StockManagementPage() {
                     children: movement.reason
                 }, void 0, false, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 277,
+                    lineNumber: 320,
                     columnNumber: 42
                 }, this)
         },
@@ -1519,7 +1560,7 @@ function StockManagementPage() {
                             className: "h-4 w-4 text-muted-foreground"
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 284,
+                            lineNumber: 327,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1527,13 +1568,13 @@ function StockManagementPage() {
                             children: movement.hub
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 285,
+                            lineNumber: 328,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 283,
+                    lineNumber: 326,
                     columnNumber: 9
                 }, this)
         },
@@ -1547,7 +1588,7 @@ function StockManagementPage() {
                             children: new Date(movement.timestamp).toLocaleDateString()
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 294,
+                            lineNumber: 337,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1555,13 +1596,13 @@ function StockManagementPage() {
                             children: new Date(movement.timestamp).toLocaleTimeString()
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 295,
+                            lineNumber: 338,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 293,
+                    lineNumber: 336,
                     columnNumber: 9
                 }, this)
         },
@@ -1573,7 +1614,7 @@ function StockManagementPage() {
                     children: movement.user
                 }, void 0, false, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 302,
+                    lineNumber: 345,
                     columnNumber: 42
                 }, this)
         }
@@ -1591,7 +1632,7 @@ function StockManagementPage() {
                                 children: "Stock Management"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 311,
+                                lineNumber: 354,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1599,13 +1640,13 @@ function StockManagementPage() {
                                 children: "Monitor and manage inventory levels across all hubs"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 312,
+                                lineNumber: 355,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 310,
+                        lineNumber: 353,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1622,20 +1663,20 @@ function StockManagementPage() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                lineNumber: 317,
+                                                lineNumber: 360,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectValue"], {
                                                 placeholder: "Select Hub"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                lineNumber: 318,
+                                                lineNumber: 361,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 316,
+                                        lineNumber: 359,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -1645,7 +1686,7 @@ function StockManagementPage() {
                                                 children: "All Hubs"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                lineNumber: 321,
+                                                lineNumber: 364,
                                                 columnNumber: 15
                                             }, this),
                                             __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockHubs"].map((hub)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -1653,19 +1694,19 @@ function StockManagementPage() {
                                                     children: hub.name
                                                 }, hub.id, false, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 323,
+                                                    lineNumber: 366,
                                                     columnNumber: 17
                                                 }, this))
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 320,
+                                        lineNumber: 363,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 315,
+                                lineNumber: 358,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1675,26 +1716,26 @@ function StockManagementPage() {
                                         className: "mr-2 h-4 w-4"
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 330,
+                                        lineNumber: 373,
                                         columnNumber: 13
                                     }, this),
                                     "Export"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 329,
+                                lineNumber: 372,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 314,
+                        lineNumber: 357,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                lineNumber: 309,
+                lineNumber: 352,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1710,22 +1751,22 @@ function StockManagementPage() {
                                         className: "h-6 w-6 text-primary"
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 341,
+                                        lineNumber: 384,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 340,
+                                    lineNumber: 383,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-2xl font-bold",
-                                            children: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockProducts"].length
+                                            children: products.length
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 344,
+                                            lineNumber: 387,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1733,24 +1774,24 @@ function StockManagementPage() {
                                             children: "Total Products"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 345,
+                                            lineNumber: 388,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 343,
+                                    lineNumber: 386,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 339,
+                            lineNumber: 382,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 338,
+                        lineNumber: 381,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -1763,12 +1804,12 @@ function StockManagementPage() {
                                         className: "h-6 w-6 text-success"
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 352,
+                                        lineNumber: 395,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 351,
+                                    lineNumber: 394,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1778,7 +1819,7 @@ function StockManagementPage() {
                                             children: healthyStockCount
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 355,
+                                            lineNumber: 398,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1786,24 +1827,24 @@ function StockManagementPage() {
                                             children: "Healthy Stock"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 356,
+                                            lineNumber: 399,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 354,
+                                    lineNumber: 397,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 350,
+                            lineNumber: 393,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 349,
+                        lineNumber: 392,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -1816,12 +1857,12 @@ function StockManagementPage() {
                                         className: "h-6 w-6 text-warning"
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 363,
+                                        lineNumber: 406,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 362,
+                                    lineNumber: 405,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1831,7 +1872,7 @@ function StockManagementPage() {
                                             children: lowStockCount
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 366,
+                                            lineNumber: 409,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1839,24 +1880,24 @@ function StockManagementPage() {
                                             children: "Low Stock"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 367,
+                                            lineNumber: 410,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 365,
+                                    lineNumber: 408,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 361,
+                            lineNumber: 404,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 360,
+                        lineNumber: 403,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -1869,12 +1910,12 @@ function StockManagementPage() {
                                         className: "h-6 w-6 text-destructive"
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 374,
+                                        lineNumber: 417,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 373,
+                                    lineNumber: 416,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1884,7 +1925,7 @@ function StockManagementPage() {
                                             children: outOfStockCount
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 377,
+                                            lineNumber: 420,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1892,30 +1933,30 @@ function StockManagementPage() {
                                             children: "Out of Stock"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 378,
+                                            lineNumber: 421,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 376,
+                                    lineNumber: 419,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 372,
+                            lineNumber: 415,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 371,
+                        lineNumber: 414,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                lineNumber: 337,
+                lineNumber: 380,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Tabs"], {
@@ -1928,7 +1969,7 @@ function StockManagementPage() {
                                 children: "Stock Levels"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 387,
+                                lineNumber: 430,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsTrigger"], {
@@ -1936,13 +1977,13 @@ function StockManagementPage() {
                                 children: "Stock Movements"
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 388,
+                                lineNumber: 431,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 386,
+                        lineNumber: 429,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -1959,7 +2000,7 @@ function StockManagementPage() {
                                         children: "All Products"
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 394,
+                                        lineNumber: 437,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1972,7 +2013,7 @@ function StockManagementPage() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                lineNumber: 407,
+                                                lineNumber: 450,
                                                 columnNumber: 15
                                             }, this),
                                             "Low Stock (",
@@ -1981,7 +2022,7 @@ function StockManagementPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 401,
+                                        lineNumber: 444,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -1994,7 +2035,7 @@ function StockManagementPage() {
                                                 className: "mr-2 h-4 w-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                lineNumber: 416,
+                                                lineNumber: 459,
                                                 columnNumber: 15
                                             }, this),
                                             "Out of Stock (",
@@ -2003,13 +2044,13 @@ function StockManagementPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 410,
+                                        lineNumber: 453,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 393,
+                                lineNumber: 436,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$card$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Card"], {
@@ -2021,23 +2062,23 @@ function StockManagementPage() {
                                         searchPlaceholder: "Search products..."
                                     }, void 0, false, {
                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                        lineNumber: 424,
+                                        lineNumber: 467,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 423,
+                                    lineNumber: 466,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 422,
+                                lineNumber: 465,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 391,
+                        lineNumber: 434,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$tabs$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TabsContent"], {
@@ -2051,28 +2092,28 @@ function StockManagementPage() {
                                     searchPlaceholder: "Search stock movements..."
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 432,
+                                    lineNumber: 475,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                                lineNumber: 431,
+                                lineNumber: 474,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 430,
+                            lineNumber: 473,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                        lineNumber: 429,
+                        lineNumber: 472,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                lineNumber: 385,
+                lineNumber: 428,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Dialog"], {
@@ -2087,23 +2128,24 @@ function StockManagementPage() {
                                     children: "Update Stock"
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 446,
+                                    lineNumber: 489,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$dialog$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["DialogDescription"], {
                                     children: selectedProduct && `Update stock for ${selectedProduct.name}`
                                 }, void 0, false, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 447,
+                                    lineNumber: 490,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 445,
+                            lineNumber: 488,
                             columnNumber: 11
                         }, this),
                         selectedProduct && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                            onSubmit: handleUpdateStock,
                             className: "space-y-4",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2117,7 +2159,7 @@ function StockManagementPage() {
                                                     children: "Current Stock"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 453,
+                                                    lineNumber: 496,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2129,13 +2171,13 @@ function StockManagementPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 454,
+                                                    lineNumber: 497,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 452,
+                                            lineNumber: 495,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2146,7 +2188,7 @@ function StockManagementPage() {
                                                     children: "Low Threshold"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 459,
+                                                    lineNumber: 502,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2157,19 +2199,75 @@ function StockManagementPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 460,
+                                                    lineNumber: 503,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 458,
+                                            lineNumber: 501,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 451,
+                                    lineNumber: 494,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "space-y-2",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
+                                            htmlFor: "hub",
+                                            children: "Hub / Store *"
+                                        }, void 0, false, {
+                                            fileName: "[project]/app/admin/products/stock/page.tsx",
+                                            lineNumber: 510,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
+                                            value: selectedHub,
+                                            onValueChange: setSelectedHub,
+                                            required: true,
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectTrigger"], {
+                                                    id: "hub",
+                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectValue"], {
+                                                        placeholder: "Select hub"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/app/admin/products/stock/page.tsx",
+                                                        lineNumber: 513,
+                                                        columnNumber: 21
+                                                    }, this)
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/admin/products/stock/page.tsx",
+                                                    lineNumber: 512,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
+                                                    children: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockHubs"].map((hub)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
+                                                            value: hub.id,
+                                                            children: hub.name
+                                                        }, hub.id, false, {
+                                                            fileName: "[project]/app/admin/products/stock/page.tsx",
+                                                            lineNumber: 517,
+                                                            columnNumber: 23
+                                                        }, this))
+                                                }, void 0, false, {
+                                                    fileName: "[project]/app/admin/products/stock/page.tsx",
+                                                    lineNumber: 515,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/app/admin/products/stock/page.tsx",
+                                            lineNumber: 511,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/app/admin/products/stock/page.tsx",
+                                    lineNumber: 509,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2177,13 +2275,16 @@ function StockManagementPage() {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
                                             htmlFor: "updateType",
-                                            children: "Update Type"
+                                            children: "Update Type *"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 467,
+                                            lineNumber: 526,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
+                                            value: updateType,
+                                            onValueChange: setUpdateType,
+                                            required: true,
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectTrigger"], {
                                                     id: "updateType",
@@ -2191,12 +2292,12 @@ function StockManagementPage() {
                                                         placeholder: "Select type"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                        lineNumber: 470,
+                                                        lineNumber: 529,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 469,
+                                                    lineNumber: 528,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -2206,7 +2307,7 @@ function StockManagementPage() {
                                                             children: "Add Stock (Procurement)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 473,
+                                                            lineNumber: 532,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -2214,7 +2315,7 @@ function StockManagementPage() {
                                                             children: "Remove Stock"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 474,
+                                                            lineNumber: 533,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -2222,25 +2323,25 @@ function StockManagementPage() {
                                                             children: "Set Stock Level"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 475,
+                                                            lineNumber: 534,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 472,
+                                                    lineNumber: 531,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 468,
+                                            lineNumber: 527,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 466,
+                                    lineNumber: 525,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2248,25 +2349,29 @@ function StockManagementPage() {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
                                             htmlFor: "quantity",
-                                            children: "Quantity"
+                                            children: "Quantity *"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 481,
+                                            lineNumber: 540,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$input$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Input"], {
                                             id: "quantity",
                                             type: "number",
-                                            placeholder: "Enter quantity"
+                                            placeholder: "Enter quantity",
+                                            value: quantity,
+                                            onChange: (e)=>setQuantity(e.target.value),
+                                            required: true,
+                                            min: "1"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 482,
+                                            lineNumber: 541,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 480,
+                                    lineNumber: 539,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2274,13 +2379,16 @@ function StockManagementPage() {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
                                             htmlFor: "reason",
-                                            children: "Reason"
+                                            children: "Reason *"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 486,
+                                            lineNumber: 553,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
+                                            value: reason,
+                                            onValueChange: setReason,
+                                            required: true,
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectTrigger"], {
                                                     id: "reason",
@@ -2288,12 +2396,12 @@ function StockManagementPage() {
                                                         placeholder: "Select reason"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                        lineNumber: 489,
+                                                        lineNumber: 556,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 488,
+                                                    lineNumber: 555,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
@@ -2303,7 +2411,7 @@ function StockManagementPage() {
                                                             children: "Procurement"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 492,
+                                                            lineNumber: 559,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -2311,7 +2419,7 @@ function StockManagementPage() {
                                                             children: "Damaged Goods"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 493,
+                                                            lineNumber: 560,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -2319,7 +2427,7 @@ function StockManagementPage() {
                                                             children: "Expired Items"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 494,
+                                                            lineNumber: 561,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -2327,7 +2435,7 @@ function StockManagementPage() {
                                                             children: "Customer Return"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 495,
+                                                            lineNumber: 562,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -2335,7 +2443,7 @@ function StockManagementPage() {
                                                             children: "Stock Correction"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 496,
+                                                            lineNumber: 563,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
@@ -2343,78 +2451,25 @@ function StockManagementPage() {
                                                             children: "Other"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 497,
+                                                            lineNumber: 564,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 491,
+                                                    lineNumber: 558,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 487,
+                                            lineNumber: 554,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 485,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "space-y-2",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$label$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Label"], {
-                                            htmlFor: "hub",
-                                            children: "Hub"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 503,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Select"], {
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectTrigger"], {
-                                                    id: "hub",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectValue"], {
-                                                        placeholder: "Select hub"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                        lineNumber: 506,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 505,
-                                                    columnNumber: 19
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectContent"], {
-                                                    children: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$mock$2d$data$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["mockHubs"].map((hub)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$select$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["SelectItem"], {
-                                                            value: hub.id,
-                                                            children: hub.name
-                                                        }, hub.id, false, {
-                                                            fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                            lineNumber: 510,
-                                                            columnNumber: 23
-                                                        }, this))
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/admin/products/stock/page.tsx",
-                                                    lineNumber: 508,
-                                                    columnNumber: 19
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 504,
-                                            columnNumber: 17
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 502,
+                                    lineNumber: 552,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2427,7 +2482,7 @@ function StockManagementPage() {
                                             children: "Cancel"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 519,
+                                            lineNumber: 570,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$components$2f$ui$2f$button$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Button"], {
@@ -2435,40 +2490,40 @@ function StockManagementPage() {
                                             children: "Update Stock"
                                         }, void 0, false, {
                                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                                            lineNumber: 522,
+                                            lineNumber: 573,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                                    lineNumber: 518,
+                                    lineNumber: 569,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/admin/products/stock/page.tsx",
-                            lineNumber: 450,
+                            lineNumber: 493,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/admin/products/stock/page.tsx",
-                    lineNumber: 444,
+                    lineNumber: 487,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/admin/products/stock/page.tsx",
-                lineNumber: 443,
+                lineNumber: 486,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/admin/products/stock/page.tsx",
-        lineNumber: 307,
+        lineNumber: 350,
         columnNumber: 5
     }, this);
 }
-_s(StockManagementPage, "5rKnvEJ+NNCaMualWv9cp0zS/Mc=");
+_s(StockManagementPage, "t6TuGvDQw5NCEQn9JTPoIOZsiEI=");
 _c = StockManagementPage;
 var _c;
 __turbopack_context__.k.register(_c, "StockManagementPage");
