@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f9fafb;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Rich Text Editor Styles */
+.rich-text-editor:empty:before {
+  content: attr(data-placeholder);
+  color: #9ca3af;
+  pointer-events: none;
+  font-style: italic;
+}
+
+.rich-text-editor h1,
+.rich-text-preview h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  line-height: 1.2;
+}
+
+.rich-text-editor h2,
+.rich-text-preview h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  line-height: 1.2;
+}
+
+.rich-text-editor h3,
+.rich-text-preview h3 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  line-height: 1.2;
+}
+
+.rich-text-editor h4,
+.rich-text-preview h4 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  line-height: 1.2;
+}
+
+.rich-text-editor blockquote,
+.rich-text-preview blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  font-style: italic;
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.rich-text-editor ul, 
+.rich-text-editor ol,
+.rich-text-preview ul,
+.rich-text-preview ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.rich-text-editor li,
+.rich-text-preview li {
+  margin: 0.25rem 0;
+}
+
+.rich-text-editor a,
+.rich-text-preview a {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.rich-text-editor a:hover,
+.rich-text-preview a:hover {
+  color: #1d4ed8;
+}
+
+.rich-text-editor strong, 
+.rich-text-editor b,
+.rich-text-preview strong,
+.rich-text-preview b {
+  font-weight: bold;
+}
+
+.rich-text-editor em, 
+.rich-text-editor i,
+.rich-text-preview em,
+.rich-text-preview i {
+  font-style: italic;
+}
+
+.rich-text-editor u,
+.rich-text-preview u {
+  text-decoration: underline;
+}
+
+.rich-text-editor p,
+.rich-text-preview p {
+  margin: 0.5rem 0;
+}
+
+.rich-text-editor br,
+.rich-text-preview br {
+  line-height: 1.5;
+}
